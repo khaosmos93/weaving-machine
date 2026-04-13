@@ -40,9 +40,9 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 const LIMITS = {
-  warpCount: { min: 8, max: 200 },
-  weftCount: { min: 8, max: 200 },
-  maxColors: { min: 2, max: 8 },
+  warpCount: { min: 8, max: 400 },
+  weftCount: { min: 8, max: 400 },
+  maxColors: { min: 2, max: 32 },
 };
 
 export default function GridSettings({ settings, onChange, disabled = false }: GridSettingsProps) {
@@ -70,7 +70,7 @@ export default function GridSettings({ settings, onChange, disabled = false }: G
           disabled={disabled}
           onChange={(e) => handleChange('warpCount', e.target.value)}
         />
-        <span style={styles.rangeHint}>8–200</span>
+        <span style={styles.rangeHint}>8–400 (current: {settings.warpCount})</span>
       </div>
 
       <div style={styles.row}>
@@ -84,7 +84,7 @@ export default function GridSettings({ settings, onChange, disabled = false }: G
           disabled={disabled}
           onChange={(e) => handleChange('weftCount', e.target.value)}
         />
-        <span style={styles.rangeHint}>8–200</span>
+        <span style={styles.rangeHint}>8–400 (current: {settings.weftCount})</span>
       </div>
 
       <div style={styles.row}>
@@ -98,7 +98,7 @@ export default function GridSettings({ settings, onChange, disabled = false }: G
           disabled={disabled}
           onChange={(e) => handleChange('maxColors', e.target.value)}
         />
-        <span style={styles.rangeHint}>2–8</span>
+        <span style={styles.rangeHint}>2–32 (current: {settings.maxColors})</span>
       </div>
     </div>
   );

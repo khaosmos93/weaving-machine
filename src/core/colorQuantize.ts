@@ -86,6 +86,38 @@ function medianCut(pixels: RGB[], count: number): RGB[] {
   return buckets.map((bkt) => averageColor(bkt.pixels));
 }
 
+/**
+ * K-means refinement: run `iterations` rounds of reassign-then-recompute-centroid
+ * over the provided pixel samples, starting from the given initial palette.
+ * Returns a refined palette of the same length.
+ */
+function kMeansRefine(initialPalette: RGB[], pixels: RGB[], iterations: number): RGB[] {
+  let palette = initialPalette.map((c): RGB => [c[0], c[1], c[2]]);
+  const k = palette.length;
+  if (k === 0 || pixels.length === 0) return palette;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    // Assign each pixel to the nearest centroid
+    const buckets: RGB[][] = Array.from({ length: k }, () => []);
+    for (const pixel of pixels) {
+      let bestIdx = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < k; i++) {
+        const d = distSq(pixel, palette[i]);
+        if (d < bestDist) { bestDist = d; bestIdx = i; }
+      }
+      buckets[bestIdx].push(pixel);
+    }
+    // Recompute centroids; keep previous centroid if bucket is empty
+    for (let i = 0; i < k; i++) {
+      if (buckets[i].length > 0) {
+        palette[i] = averageColor(buckets[i]);
+      }
+    }
+  }
+  return palette;
+}
+
 /** Find the index of the nearest palette color for a given pixel */
 export function nearestPaletteIndex(pixel: RGB, palette: RGB[]): number {
   let bestIdx = 0;
@@ -134,8 +166,7 @@ export function quantizeImage(imageData: ImageData, maxColors: number): Quantize
     samplePixels.push([128, 128, 128]);
   }
 
-  const clampedMax = Math.min(maxColors, 8);
-  const palette = medianCut(samplePixels, clampedMax);
+  const palette = kMeansRefine(medianCut(samplePixels, maxColors), samplePixels, 5);
 
   // Map every pixel to nearest palette color
   const indices = new Uint8Array(total);

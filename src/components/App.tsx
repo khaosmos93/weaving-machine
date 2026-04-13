@@ -7,9 +7,9 @@ import GridSettings from './GridSettings';
 import WeavingView from './WeavingView';
 
 const DEFAULT_SETTINGS: GridSettingsType = {
-  warpCount: 60,
-  weftCount: 80,
-  maxColors: 6,
+  warpCount: 120,
+  weftCount: 160,
+  maxColors: 16,
 };
 
 const styles: Record<string, React.CSSProperties> = {
@@ -199,7 +199,10 @@ export default function App() {
         {/* Main content */}
         <main style={styles.main}>
           {draft ? (
-            <WeavingView draft={draft} cellSize={8} />
+            <WeavingView
+              draft={draft}
+              cellSize={draft.warpCount > 200 ? 4 : draft.warpCount > 100 ? 6 : 8}
+            />
           ) : (
             <div style={{ color: '#555', marginTop: '40px', textAlign: 'center' }}>
               Click <strong>Weave</strong> to generate the cloth simulation.

@@ -60,9 +60,12 @@ export function renderCloth(
   draft: WeavingDraft,
   opts: Partial<ClothRenderOptions> = {}
 ): void {
-  const options = { ...DEFAULT_OPTIONS, ...opts };
-  const { cellSize, showSlits, showFloatWarnings } = options;
   const { warpCount, weftCount, palette, grid, slitMap } = draft;
+
+  // Dynamic cell size based on resolution
+  const autoCellSize = warpCount > 200 ? 4 : warpCount > 100 ? 6 : 8;
+  const options = { ...DEFAULT_OPTIONS, cellSize: autoCellSize, ...opts };
+  const { cellSize, showSlits, showFloatWarnings } = options;
 
   const width = warpCount * cellSize;
   const height = weftCount * cellSize;
@@ -87,8 +90,9 @@ export function renderCloth(
         ? (palette[cell.colorIndex] ?? WARP_COLOR)
         : WARP_COLOR;
 
-      // Apply noise for fiber texture
-      const [r, g, b] = applyNoise(baseColor, rng, 10);
+      // Apply noise for fiber texture — reduce intensity at small cell sizes
+      const noiseAmount = cellSize <= 4 ? 4 : cellSize <= 6 ? 7 : 10;
+      const [r, g, b] = applyNoise(baseColor, rng, noiseAmount);
       ctx.fillStyle = rgbToHex(r, g, b);
       ctx.fillRect(x, y, cellSize, cellSize);
 
